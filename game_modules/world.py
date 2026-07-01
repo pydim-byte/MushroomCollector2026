@@ -184,13 +184,12 @@ class World:
         offset_from_boss = 50
 
         image = self.assets["spore.png"]
-        shifts = [2, 0, -2]
         starting_angles = [a for a in range(0, 341, 20)]
 
         for a in starting_angles:
-            a += random.choice(shifts)
+            a += random.choice(range(-20, 21))
             if a < 0:
-                a = 2
+                a = 0
 
             direction_from_boss_x = round(math.cos(float(math.radians(a))), 4)
             direction_from_boss_y = round(-math.sin(float(math.radians(a))), 4)

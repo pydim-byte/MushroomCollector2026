@@ -12,7 +12,7 @@ class Spore(DynamicObject):
         self.phasing = True
         self.type : str = 'spore'
         self.acceleration : int = 1
-        self.speed : int = 4
+        self.speed : int = 6
         self.max_speed : int = 1
         
         self.timer = 0
