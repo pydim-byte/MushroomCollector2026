@@ -14,8 +14,6 @@ class Spore(DynamicObject):
         self.acceleration : int = 1
         self.speed : int = 6
         self.max_speed : int = 1
-        
-        self.timer = 0
 
     def set_direction(self, direction="away_from_boss") -> pygame.Vector2:
         self.direction.xy = self.movement_direction.xy
@@ -28,8 +26,7 @@ class Spore(DynamicObject):
         super().fixed_update()
 
     def update(self, dt):
-        self.timer += dt
-        if self.timer >= 10:
+        if not self.rect.colliderect(pygame.Rect(0, 40, 800, 600)):
             self.kill()
 
     def draw(self, surf : pygame.surface.Surface, alpha : float) -> None:

@@ -7,6 +7,7 @@ from game_modules.objects.static_object import StaticObject
 from game_modules.objects.dynamic_object import DynamicObject
 from game_modules.objects.object_clock import ObjectClock
 from game_modules.objects.hud import Hud
+from game_modules.objects.boss_hud import BossHud
 from game_modules.objects.invisible_wall import InvisibleWall
 from game_modules.objects.player import Player
 from game_modules.objects.normal_mushroom import NormalMushroom
@@ -20,6 +21,7 @@ from game_modules.objects.key import Key
 from game_modules.objects.flood import Flood
 from game_modules.objects.boss import Boss
 from game_modules.objects.spore import Spore
+from game_modules.objects.super_mushroom import SuperMushroom
 
 
 class World:
@@ -57,10 +59,17 @@ class World:
         self.all_sprites.add(self.background, layer=1)
 
     def get_hug(self) -> None:
-        image = self.assets["game_hud.png"]
-        pos = pygame.Vector2(0, 0)
-        font = self.assets["PressStart2P.ttf"]
-        self.hud = Hud(image, pos, font)
+        if World.GAMEPLAY_LEVEL != 9:
+            image = self.assets["game_hud.png"]
+            pos = pygame.Vector2(0, 0)
+            font = self.assets["PressStart2P.ttf"]
+            self.hud = Hud(image, pos, font)
+        else:
+            image = self.assets["game_hud.png"]
+            pos = pygame.Vector2(0, 0)
+            font = self.assets["PressStart2P.ttf"]
+            self.hud = BossHud(image, self.assets["full_heart.png"], self.assets["empty_heart.png"], pos, font, self.player, self.boss)
+
         self.hud.level = World.GAMEPLAY_LEVEL
         self.all_sprites.add(self.hud, layer=9)
 
@@ -83,8 +92,9 @@ class World:
 
     def get_player(self) -> None:
         image = self.assets["player.png"]
+        super_image = self.assets["super_player.png"]
         pos = pygame.Vector2(100, 320)
-        self.player = Player(image, pos)
+        self.player = Player(image, pos, super_image)
         self.all_sprites.add(self.player, layer=10)
         self.dynamic_objects.append(self.player)
 
@@ -154,11 +164,11 @@ class World:
 
     def get_flood(self) -> None:
         image = self.assets["flood.png"]
-        pos = self.game_grid.get_flood_spawn_pos()
+        pos = self.game_grid.get_late_object_spawn_pos()
         flood = Flood(image, pos)
         s_rects = [s.rect for s in self.all_sprites if isinstance(s, (Player, NormalMushroom, Flood))]
         for _ in range(100):
-            pos = self.game_grid.get_flood_spawn_pos()
+            pos = self.game_grid.get_late_object_spawn_pos()
             flood = Flood(image, pos)
             if flood.rect.collidelist(s_rects) == -1:
                 test_rect = flood.rect.copy()
@@ -175,22 +185,18 @@ class World:
     def get_boss(self) -> None:
         image = self.assets["boss.png"]
         pos = pygame.Vector2(700, 320)
-        self.boss = Boss(image, pos, self.get_player_pos, self.get_spores)
+        self.boss = Boss(image, pos, self.get_player_pos, self.get_spores, self.get_super_mushroom)
         self.all_sprites.add(self.boss, layer=9)
         self.dynamic_objects.append(self.boss)
 
     def get_spores(self) -> None:
         boss_center = pygame.Vector2(self.boss.rect.center)
-        offset_from_boss = 50
 
         image = self.assets["spore.png"]
-        starting_angles = [a for a in range(0, 341, 20)]
+        shift = random.choice([s for s in range(0, 16, 2)])
+        starting_angles = [a+shift for a in range(0, 341, 20)]
 
         for a in starting_angles:
-            a += random.choice(range(-20, 21))
-            if a < 0:
-                a = 0
-
             direction_from_boss_x = round(math.cos(float(math.radians(a))), 4)
             direction_from_boss_y = round(-math.sin(float(math.radians(a))), 4)
             pos = pygame.Vector2(boss_center)
@@ -199,7 +205,25 @@ class World:
             self.all_sprites.add(spore, layer=8)
             self.dynamic_objects.append(spore)
 
-
+    def get_super_mushroom(self) -> None:
+        image = self.assets["super_mushroom.png"]
+        pos = self.game_grid.get_late_object_spawn_pos()
+        super_mushroom = SuperMushroom(image, pos)
+        s_rects = [s.rect for s in self.all_sprites if isinstance(s, (Player, Boss))]
+        for _ in range(100):
+            pos = self.game_grid.get_late_object_spawn_pos()
+            super_mushroom = SuperMushroom(image, pos)
+            if super_mushroom.rect.collidelist(s_rects) == -1:
+                test_rect = super_mushroom.rect.copy()
+                test_rect.scale_by_ip(3, 3)
+                test_rect.center = super_mushroom.rect.center
+                if not test_rect.colliderect(self.player.rect):
+                    break
+        else:
+            print("flood failed")
+            return
+        self.all_sprites.add(super_mushroom, layer=8)
+        self.static_objects.append(super_mushroom)
 
     def get_object_clock(self, object) -> None:
         if object == SkyMushroom:
@@ -210,7 +234,6 @@ class World:
             self.object_clocks.append(flood_clock)
 
     def get_gameplay_objects(self) -> None:
-        self.get_hug()
         self.get_invisible_walls()
         self.get_player()
         if World.GAMEPLAY_LEVEL in (1, 2, 3, 8):
@@ -232,6 +255,7 @@ class World:
             self.get_object_clock(object=Flood)
         if World.GAMEPLAY_LEVEL == 9:
             self.get_boss()
+        self.get_hug()
 
     def get_player_pos(self) -> pygame.Vector2:
         player_center = self.player.rect.center
@@ -284,3 +308,11 @@ class World:
 
             if obj_b.current_phase["name"] == "chase":
                 obj_b.knockback_vel.xy = boss_knockback_vector.xy
+        elif isinstance(obj_a, Player) and isinstance(obj_b, Spore):   
+            obj_b.kill()
+            if not obj_a.super:
+                obj_a.hp -= 1
+        elif isinstance(obj_a, Player) and isinstance(obj_b, SuperMushroom):
+            obj_a.start_super_state()
+            obj_b.kill()
+            self.boss.hp -= 1

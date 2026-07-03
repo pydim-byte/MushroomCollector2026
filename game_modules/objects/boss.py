@@ -6,10 +6,11 @@ from .dynamic_object import DynamicObject
 
 
 class Boss(DynamicObject):
-    def __init__(self, image : pygame.surface.Surface, pos : pygame.Vector2, get_player_pos, spawn_spores):
+    def __init__(self, image : pygame.surface.Surface, pos : pygame.Vector2, get_player_pos, spawn_spores, spawn_super_mushroom):
         super().__init__(image, pos)
         self.get_player_pos = get_player_pos
         self.spawn_spores = spawn_spores
+        self.spawn_super_mushroom = spawn_super_mushroom
         self.type : str = 'boss'
         self.acceleration : int = 1
         self.speed : int = 0
@@ -20,14 +21,14 @@ class Boss(DynamicObject):
         self.boss_phases : list[Dict[str, Union[str, float]]] = [{"name" : "move_to_center", "duration" : 2.0},
                                                                  {"name" : "shoot_player", "duration" : 0.6},
                                                                  {"name" : "shoot_player", "duration" : 0.6},
-                                                                 {"name" : "shoot_player", "duration" : 0.6},
-                                                                 {"name" : "shoot_player", "duration" : 0.6},]
+                                                                {"name" : "spawn_super_mushroom", "duration" : 0.6},]
         
+        self.hp : int = 3
         self.current_phase_index : int = 0
         self.current_phase : Dict[str, Union[str, float]] = self.boss_phases[self.current_phase_index]
 
     def set_direction(self, direction="to_player") -> pygame.Vector2:
-        if self.current_phase["name"] in ["wait", "shoot_player"]:
+        if self.current_phase["name"] in ["wait", "shoot_player", "spawn_super_mushroom"]:
             return
         if self.current_phase["name"] == "move_to_center":
             boss_center = pygame.Vector2(self.rect.center)
@@ -78,6 +79,7 @@ class Boss(DynamicObject):
             self.current_phase_index %= len(self.boss_phases)
             self.current_phase = self.boss_phases[self.current_phase_index]
             if self.current_phase["name"] == "shoot_player": self.spawn_spores()
+            elif self.current_phase["name"] == "spawn_super_mushroom": self.spawn_super_mushroom()
         elif self.current_phase["name"] == "shoot_player":
             pass
 
@@ -86,4 +88,4 @@ class Boss(DynamicObject):
         draw_rect = self.rect.copy()
         draw_rect.topleft = alpha_pos
         surf.blit(self.image, draw_rect)
-        pygame.draw.circle(surf, "red", self.rect.center, 200, width=4)
+        #pygame.draw.circle(surf, "red", self.rect.center, 200, width=4)

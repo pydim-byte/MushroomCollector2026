@@ -4,12 +4,18 @@ from .dynamic_object import DynamicObject
 
 
 class Player(DynamicObject):
-    def __init__(self, image : pygame.surface.Surface, pos : pygame.Vector2):
+    def __init__(self, image : pygame.surface.Surface, pos : pygame.Vector2, super_player):
         super().__init__(image, pos)
+        self.normal_player : pygame.surface.Surface = image.copy()
+        self.super_player : pygame.surface.Surface = super_player
+        self.super : bool = False
         self.type : str = 'player'
         self.acceleration : int = 1
         self.speed : int = 0
         self.max_speed : int = PlayerStats.PLAYER_MAX_MOVEMENT_SPEED
+
+        self.hp : int = 3
+        self.super_time : float = 0
 
     def calculate_velocity(self) -> None:
         self.direction.xy = self.movement_direction.xy
@@ -30,6 +36,21 @@ class Player(DynamicObject):
 
     def fixed_update(self) -> None:
         super().fixed_update()
+
+    def start_super_state(self) -> None:
+        self.super = True
+        self.super_time += 5
+        self.image = self.super_player
+
+    def update(self, dt):
+        if self.super and self.super_time > 0:
+            self.super_time -= dt
+        elif self.super and self.super_time <= 0:
+            self.super = False
+            self.super_time = 0
+            self.image = self.normal_player
+
+            
 
     def draw(self, surf : pygame.surface.Surface, alpha : float) -> None:
         alpha_pos = self.pos * alpha + self.prev_pos * (1 - alpha)

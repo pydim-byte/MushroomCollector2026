@@ -44,7 +44,7 @@ class GameGrid():
         pos = pygame.Vector2(20 + random_row_index * 40, 40 + random_col_index * 40)
         return pos
     
-    def get_flood_spawn_pos(self) -> pygame.Vector2:
+    def get_late_object_spawn_pos(self) -> pygame.Vector2:
         random_col_index = random.randint(2, len(self.grid)-2)
         random_col = self.grid[random_col_index]
         random_row_index = random.randint(1, len(random_col)-2)
