@@ -22,10 +22,11 @@ from game_modules.objects.flood import Flood
 from game_modules.objects.boss import Boss
 from game_modules.objects.spore import Spore
 from game_modules.objects.super_mushroom import SuperMushroom
+from game_modules.objects.cutscene_player import CutscenePlayer
 
 
 class World:
-    GAMEPLAY_LEVEL : int = 9
+    GAMEPLAY_LEVEL : int = 1
     def __init__(self, state : StateName = StateName.MAIN_MENU):
         self.state = state
         self.assets_loader = AssetsLoader()
@@ -39,6 +40,18 @@ class World:
             self.collected_mushrooms : int = 0
             self.game_grid = GameGrid()
             self.get_gameplay_objects()
+        if self.state == StateName.CUTSCENE and World.GAMEPLAY_LEVEL != 1:
+            self.get_cutscene()
+
+    def get_cutscene(self) -> None:
+        image = self.assets_loader.assets[f"cutscene_{World.GAMEPLAY_LEVEL}.png"]
+        pos = pygame.Vector2(0, 0)
+        if World.GAMEPLAY_LEVEL != 8:
+            frame_duration = 0.02
+        else:
+            frame_duration = 0.2
+        cutscene = CutscenePlayer(image, pos, frame_duration)
+        self.all_sprites.add(cutscene, layer=10)
 
     def get_background(self) -> None:
         if self.state == StateName.MAIN_MENU:
@@ -53,6 +66,8 @@ class World:
             image = self.assets["complete_screen.png"]
         elif self.state == StateName.GAME_OVER:
             image = self.assets["over_screen.png"]
+        elif self.state == StateName.CUTSCENE:
+            image = self.assets["gameplay_background.png"]
 
         pos = pygame.Vector2(0, 0)  
         self.background = StaticImage(image, pos)
@@ -293,6 +308,7 @@ class World:
         elif isinstance(obj_a, SkyMushroom) and isinstance(obj_b, InvisibleWall):
             if not obj_a.phasing:
                 self.player.kill()
+                self.assets["hit.wav"].play()
         elif isinstance(obj_a, Player) and isinstance(obj_b, Boss):
             player_center = pygame.Vector2(obj_a.rect.center)
             boss_center = pygame.Vector2(obj_b.rect.center)
@@ -306,13 +322,20 @@ class World:
             if boss_knockback_vector.length() != 0: boss_knockback_vector.normalize_ip()
             boss_knockback_vector = boss_knockback_vector*16
 
+            self.assets["hit.wav"].play()
+            if obj_a.super:
+                obj_b.hp -= 1
+            else:
+                obj_a.hp -= 1
+
             if obj_b.current_phase["name"] == "chase":
                 obj_b.knockback_vel.xy = boss_knockback_vector.xy
         elif isinstance(obj_a, Player) and isinstance(obj_b, Spore):   
             obj_b.kill()
             if not obj_a.super:
                 obj_a.hp -= 1
+                self.assets["hit.wav"].play()
         elif isinstance(obj_a, Player) and isinstance(obj_b, SuperMushroom):
             obj_a.start_super_state()
             obj_b.kill()
-            self.boss.hp -= 1
+            self.assets["powerup.wav"].play()

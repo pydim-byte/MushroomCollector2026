@@ -21,8 +21,11 @@ class LevelMenu(State):
 
     def play_selected_level(self) -> None:
         self.quit = True
-        self.next_state = StateName.GAMEPLAY
         World.GAMEPLAY_LEVEL = self.selected
+        if World.GAMEPLAY_LEVEL != 1:
+            self.next_state = StateName.CUTSCENE
+        else:
+            self.next_state = StateName.GAMEPLAY
 
     def quit_menu(self) -> None:
         self.quit = True

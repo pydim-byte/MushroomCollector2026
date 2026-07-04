@@ -31,8 +31,11 @@ class Gameplay(State):
 
     def complete_level(self) -> None:
         self.quit = True
-        self.next_state = StateName.LEVEL_COMPLETE
         World.GAMEPLAY_LEVEL += 1
+        if World.GAMEPLAY_LEVEL != 1:
+            self.next_state = StateName.CUTSCENE
+        else:
+            self.next_state = StateName.GAMEPLAY
 
     def handle_inputs(self, inputs : dict[pygame.event.Event, bool]) -> None:
         if inputs[pygame.K_SPACE]:

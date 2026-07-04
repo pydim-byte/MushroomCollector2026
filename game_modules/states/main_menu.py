@@ -27,7 +27,10 @@ class MainMenu(State):
 
     def start_game(self) -> None:
         self.quit = True
-        self.next_state = StateName.GAMEPLAY
+        if World.GAMEPLAY_LEVEL != 1:
+            self.next_state = StateName.CUTSCENE
+        else:
+            self.next_state = StateName.GAMEPLAY
 
     def enter_level_menu(self) -> None:
         self.quit = True
