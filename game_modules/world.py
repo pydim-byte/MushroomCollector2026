@@ -27,6 +27,8 @@ from game_modules.objects.cutscene_player import CutscenePlayer
 
 class World:
     GAMEPLAY_LEVEL : int = 1
+    TOTAL_MUSHROOMS_COLLECTED : int = 0
+    BOUGHT_FROM_SHOP : bool = False
     def __init__(self, state : StateName = StateName.MAIN_MENU):
         self.state = state
         self.assets_loader = AssetsLoader()

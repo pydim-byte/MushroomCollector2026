@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from .state import State
 import pygame, sys
-from game_modules.globals import GameScreen, GameUpdate, PlayerStats
+from game_modules.globals import SkinsUnlocks
 from game_modules.namings import StateName
 from game_modules.states.state import State
 from game_modules.world import World
@@ -31,11 +31,25 @@ class Gameplay(State):
 
     def complete_level(self) -> None:
         self.quit = True
+        
+        if World.GAMEPLAY_LEVEL in SkinsUnlocks.LEVELS_WITH_SHOP:
+            if not World.BOUGHT_FROM_SHOP:
+                #self.next_state = SHOP
+                World.GAMEPLAY_LEVEL += 1
+                return
+            
+        if World.GAMEPLAY_LEVEL in SkinsUnlocks.LEVELS_WITH_SKINS:
+            if not SkinsUnlocks.SKINS[World.GAMEPLAY_LEVEL]["unlocked"]:
+                #self.next_state = NEW SKIN
+                World.GAMEPLAY_LEVEL += 1
+                return
+
         World.GAMEPLAY_LEVEL += 1
         if World.GAMEPLAY_LEVEL != 1:
             self.next_state = StateName.CUTSCENE
         else:
             self.next_state = StateName.GAMEPLAY
+
 
     def handle_inputs(self, inputs : dict[pygame.event.Event, bool]) -> None:
         if inputs[pygame.K_SPACE]:
