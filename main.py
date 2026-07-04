@@ -15,6 +15,7 @@ from game_modules.states.gameplay import Gameplay
 from game_modules.states.level_complete import LevelComplete
 from game_modules.states.game_over import GameOver
 from game_modules.states.cutscene import Cutscene
+from game_modules.states.new_skin import NewSkin
 
 
 
@@ -35,7 +36,8 @@ class Game:
                                                 StateName.SKINS_MENU : SkinsMenu,
                                                 StateName.LEVEL_COMPLETE : LevelComplete,
                                                 StateName.GAME_OVER : GameOver,
-                                                StateName.CUTSCENE : Cutscene}
+                                                StateName.CUTSCENE : Cutscene,
+                                                StateName.NEW_SKIN : NewSkin}
         self.state : State = LoadingScreen()
 
     def handle_events(self, event : pygame.event.Event) -> None:

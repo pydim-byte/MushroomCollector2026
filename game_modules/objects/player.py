@@ -1,13 +1,16 @@
 import pygame
+from typing import Tuple
 from ..globals import GameScreen, PlayerStats
 from .dynamic_object import DynamicObject
 
 
 class Player(DynamicObject):
-    def __init__(self, image : pygame.surface.Surface, pos : pygame.Vector2, super_player):
+    def __init__(self, image : pygame.surface.Surface, pos : pygame.Vector2, super_player, skin : pygame.surface.Surface, skin_offset : Tuple[int, int]):
         super().__init__(image, pos)
         self.normal_player : pygame.surface.Surface = image.copy()
         self.super_player : pygame.surface.Surface = super_player
+        self.skin = skin
+        self.skin_offset = skin_offset
         self.super : bool = False
         self.type : str = 'player'
         self.acceleration : int = 1
@@ -57,3 +60,7 @@ class Player(DynamicObject):
         draw_rect = self.rect.copy()
         draw_rect.topleft = alpha_pos
         surf.blit(self.image, draw_rect)
+        if self.skin:
+            skin_rect = draw_rect.copy()
+            skin_rect.move_ip(self.skin_offset)
+            surf.blit(self.skin, skin_rect)

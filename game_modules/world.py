@@ -1,6 +1,7 @@
 import pygame, random, math
 from .namings import StateName 
 from .assets_loader import AssetsLoader
+from game_modules.globals import SkinsUnlocks
 from game_modules.game_grid import GameGrid
 from game_modules.objects.static_image import StaticImage
 from game_modules.objects.static_object import StaticObject
@@ -27,6 +28,7 @@ from game_modules.objects.cutscene_player import CutscenePlayer
 
 class World:
     GAMEPLAY_LEVEL : int = 1
+    PLAYER_SKIN : str = None #SkinsUnlocks.SKINS[7]["skin"], SkinsUnlocks.SKINS[7]["offset"]
     TOTAL_MUSHROOMS_COLLECTED : int = 0
     BOUGHT_FROM_SHOP : bool = False
     def __init__(self, state : StateName = StateName.MAIN_MENU):
@@ -88,7 +90,7 @@ class World:
             self.hud = BossHud(image, self.assets["full_heart.png"], self.assets["empty_heart.png"], pos, font, self.player, self.boss)
 
         self.hud.level = World.GAMEPLAY_LEVEL
-        self.all_sprites.add(self.hud, layer=9)
+        self.all_sprites.add(self.hud, layer=12)
 
     def get_invisible_walls(self) -> None:
         image_north = pygame.surface.Surface((800, 40))
@@ -110,8 +112,14 @@ class World:
     def get_player(self) -> None:
         image = self.assets["player.png"]
         super_image = self.assets["super_player.png"]
+        if World.PLAYER_SKIN:
+            skin = self.assets[World.PLAYER_SKIN[0]]
+            skin_offset = World.PLAYER_SKIN[1]
+        else:
+            skin = None
+            skin_offset = None
         pos = pygame.Vector2(100, 320)
-        self.player = Player(image, pos, super_image)
+        self.player = Player(image, pos, super_image, skin, skin_offset)
         self.all_sprites.add(self.player, layer=10)
         self.dynamic_objects.append(self.player)
 

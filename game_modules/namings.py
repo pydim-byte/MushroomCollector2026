@@ -10,3 +10,4 @@ class StateName(Enum):
     LEVEL_COMPLETE = auto()
     GAME_OVER = auto()
     CUTSCENE = auto()
+    NEW_SKIN = auto()

@@ -35,13 +35,11 @@ class Gameplay(State):
         if World.GAMEPLAY_LEVEL in SkinsUnlocks.LEVELS_WITH_SHOP:
             if not World.BOUGHT_FROM_SHOP:
                 #self.next_state = SHOP
-                World.GAMEPLAY_LEVEL += 1
                 return
             
         if World.GAMEPLAY_LEVEL in SkinsUnlocks.LEVELS_WITH_SKINS:
             if not SkinsUnlocks.SKINS[World.GAMEPLAY_LEVEL]["unlocked"]:
-                #self.next_state = NEW SKIN
-                World.GAMEPLAY_LEVEL += 1
+                self.next_state = StateName.NEW_SKIN
                 return
 
         World.GAMEPLAY_LEVEL += 1
