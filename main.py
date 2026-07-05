@@ -118,8 +118,9 @@ class Game:
             self.update(dt)
             self.draw(alpha)
 
-game = Game()
+
 try:
+    game = Game()
     game.run()
 except SystemExit:
     pass
