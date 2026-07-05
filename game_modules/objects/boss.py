@@ -24,7 +24,7 @@ class Boss(DynamicObject):
                                                                  {"name" : "shoot_player", "duration" : 16.0},
                                                                 {"name" : "spawn_super_mushroom", "duration" : 2.0},]
         
-        self.hp : int = 3
+        self.hp : int = 0
         self.current_phase_index : int = 0
         self.current_phase : Dict[str, Union[str, float]] = self.boss_phases[self.current_phase_index]
 

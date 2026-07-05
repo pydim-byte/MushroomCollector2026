@@ -41,12 +41,10 @@ class Gameplay(State):
             if not SkinsUnlocks.SKINS[World.GAMEPLAY_LEVEL]["unlocked"]:
                 self.next_state = StateName.NEW_SKIN
                 return
-        print(World.GAMEPLAY_LEVEL)
         if World.GAMEPLAY_LEVEL != 9:
             World.GAMEPLAY_LEVEL += 1
-            self.next_state = StateName.CUTSCENE
-        else:
-            self.next_state = StateName.LEVEL_COMPLETE
+        self.next_state = StateName.LEVEL_COMPLETE
+
 
 
     def handle_inputs(self, inputs : dict[pygame.event.Event, bool]) -> None:

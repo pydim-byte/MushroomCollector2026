@@ -57,7 +57,7 @@ class AssetsLoader():
                 self.assets[font] = loaded_font
 
     def load_image(self, image : str , path : str) -> None:
-        loaded_image = pygame.image.load(path).convert_alpha()
+        loaded_image = pygame.image.load(path)
         self.assets[image] = loaded_image
 
     def load_music(self, music : str , path : str) -> None:

@@ -20,16 +20,21 @@ class SkinsMenu(State):
                                                              pygame.color.Color(80, 80, 80)] 
         self.menu_actions = [self.next_skin, self.choose_skin, self.quit_menu]
 
-        self.skins_list = [None] + [skin for skin in SkinsUnlocks.SKINS.items() if skin[1]["unlocked"]]
+        self.skins_list = [(0, )] + [skin for skin in SkinsUnlocks.SKINS.items() if skin[1]["unlocked"]]
         self.skins_amount = len(self.skins_list)
-        self.current_skin_index = self.skins_list.index(World.PLAYER_SKIN[0])+1 if World.PLAYER_SKIN else 0
+        skin_levels = [s[0] for s in self.skins_list]
+        self.current_skin_index = skin_levels.index(World.PLAYER_SKIN[0]) if World.PLAYER_SKIN else 0
+
 
     def next_skin(self) -> None:
         self.current_skin_index += 1
         self.current_skin_index %= self.skins_amount
 
     def choose_skin(self) -> None:
-        World.PLAYER_SKIN = self.skins_list[self.current_skin_index][0], self.skins_list[self.current_skin_index][1]["skin"], self.skins_list[self.current_skin_index][1]["offset"] 
+        if self.skins_list[self.current_skin_index][0] != 0:
+            World.PLAYER_SKIN = self.skins_list[self.current_skin_index][0], self.skins_list[self.current_skin_index][1]["skin"], self.skins_list[self.current_skin_index][1]["offset"] 
+        else:
+            World.PLAYER_SKIN = None
 
     def quit_menu(self) -> None:
         self.quit = True
@@ -76,7 +81,7 @@ class SkinsMenu(State):
         player_rect.centery = 200
         screen.blit(player_surf, player_rect)
 
-        if self.skins_list[self.current_skin_index] is not None:
+        if self.skins_list[self.current_skin_index][0] != 0:
             skin_surf = self.assets[self.skins_list[self.current_skin_index][1]["skin"]]
             skin_offset = self.skins_list[self.current_skin_index][1]["offset"]
             skin_rect = player_rect
