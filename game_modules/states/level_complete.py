@@ -23,15 +23,19 @@ class LevelComplete(State):
         self.quit = True
         if World.GAMEPLAY_LEVEL != 9:
             self.next_state = StateName.CUTSCENE
+            World.GAMEPLAY_LEVEL += 1
         else:
             World.GAMEPLAY_LEVEL = 1
             self.next_state = StateName.GAMEPLAY
+            
 
     def quit_menu(self) -> None:
         self.quit = True
         self.next_state = StateName.MAIN_MENU
         if World.GAMEPLAY_LEVEL == 9:
             World.GAMEPLAY_LEVEL = 1
+        else:
+            World.GAMEPLAY_LEVEL += 1
 
     def menu_up(self) -> None:
         if self.current_menu_item == 0:

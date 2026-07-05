@@ -29,7 +29,6 @@ class Shop(State):
     def quit_menu(self) -> None:
         self.quit = True
         self.next_state = StateName.LEVEL_COMPLETE
-        World.GAMEPLAY_LEVEL += 1
 
     def menu_up(self) -> None:
         if self.current_menu_item == 0:

@@ -254,6 +254,7 @@ class World:
     def get_object_clock(self, object) -> None:
         if object == SkyMushroom:
             sky_mushroom_clock = ObjectClock(1.0, self.get_sky_mushroom)
+            sky_mushroom_clock.max_spawn = 20
             self.object_clocks.append(sky_mushroom_clock)
         if object == Flood:
             flood_clock = ObjectClock(0.25, self.get_flood)
