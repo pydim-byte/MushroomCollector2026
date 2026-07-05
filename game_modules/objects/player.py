@@ -19,6 +19,9 @@ class Player(DynamicObject):
 
         self.hp : int = 3
         self.super_time : float = 0
+        self.invinsible : bool = False
+        self.invinsibility_time : float = 0
+        self.invinsibility_duration : float = 0.4
 
     def calculate_velocity(self) -> None:
         self.direction.xy = self.movement_direction.xy
@@ -53,7 +56,11 @@ class Player(DynamicObject):
             self.super_time = 0
             self.image = self.normal_player
 
-            
+        if self.invinsible:
+            self.invinsibility_time += dt
+        if self.invinsibility_time >= self.invinsibility_duration:
+            self.invinsible = False
+            self.invinsibility_time = 0
 
     def draw(self, surf : pygame.surface.Surface, alpha : float) -> None:
         alpha_pos = self.pos * alpha + self.prev_pos * (1 - alpha)

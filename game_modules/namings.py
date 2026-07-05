@@ -11,3 +11,4 @@ class StateName(Enum):
     GAME_OVER = auto()
     CUTSCENE = auto()
     NEW_SKIN = auto()
+    SHOP = auto()

@@ -22,16 +22,18 @@ class NewSkin(State):
 
     def next_level(self) -> None:
         self.quit = True
-        self.next_state = StateName.GAMEPLAY
-        World.PLAYER_SKIN = SkinsUnlocks.SKINS[World.GAMEPLAY_LEVEL]["skin"], SkinsUnlocks.SKINS[World.GAMEPLAY_LEVEL]["offset"]
+        self.next_state = StateName.LEVEL_COMPLETE
+        World.PLAYER_SKIN = World.GAMEPLAY_LEVEL, SkinsUnlocks.SKINS[World.GAMEPLAY_LEVEL]["skin"], SkinsUnlocks.SKINS[World.GAMEPLAY_LEVEL]["offset"]
         SkinsUnlocks.SKINS[World.GAMEPLAY_LEVEL]["unlocked"] = True
-        World.GAMEPLAY_LEVEL += 1
+        if World.GAMEPLAY_LEVEL != 9:
+            World.GAMEPLAY_LEVEL += 1
 
     def quit_menu(self) -> None:
         self.quit = True
-        self.next_state = StateName.GAMEPLAY
+        self.next_state = StateName.LEVEL_COMPLETE
         SkinsUnlocks.SKINS[World.GAMEPLAY_LEVEL]["unlocked"] = True
-        World.GAMEPLAY_LEVEL += 1
+        if World.GAMEPLAY_LEVEL != 9:
+            World.GAMEPLAY_LEVEL += 1
 
     def menu_up(self) -> None:
         if self.current_menu_item == 0:

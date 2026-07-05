@@ -21,13 +21,13 @@ class PlayerStats():
     PLAYER_MAX_MOVEMENT_SPEED : int = 8
 
 class SkinsUnlocks:
-    LEVELS_WITH_SKINS = (3, 6, 7, 10)
+    LEVELS_WITH_SKINS = (3, 6, 7, 9)
     LEVELS_WITH_SHOP = (7,)
     SKINS = {
         3 : {"skin" : "glasses.png", "offset": (0, 0), "unlocked" : False},
         6 : {"skin" : "cool.png", "offset": (0, 0), "unlocked" : False},
         7 : {"skin" : "angel.png", "offset": (0, -7), "unlocked" : False},
-        10 : {"skin" : "bro.png", "offset": (0, -2), "unlocked" : False},
+        9 : {"skin" : "bro.png", "offset": (0, -2), "unlocked" : False},
     }
 
 

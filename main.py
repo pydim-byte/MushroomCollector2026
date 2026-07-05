@@ -16,7 +16,7 @@ from game_modules.states.level_complete import LevelComplete
 from game_modules.states.game_over import GameOver
 from game_modules.states.cutscene import Cutscene
 from game_modules.states.new_skin import NewSkin
-
+from game_modules.states.shop import Shop
 
 
 class Game:
@@ -37,7 +37,8 @@ class Game:
                                                 StateName.LEVEL_COMPLETE : LevelComplete,
                                                 StateName.GAME_OVER : GameOver,
                                                 StateName.CUTSCENE : Cutscene,
-                                                StateName.NEW_SKIN : NewSkin}
+                                                StateName.NEW_SKIN : NewSkin,
+                                                StateName.SHOP : Shop}
         self.state : State = LoadingScreen()
 
     def handle_events(self, event : pygame.event.Event) -> None:
@@ -70,6 +71,9 @@ class Game:
 
     def flip_state(self) -> None:
         for k in self.inputs: self.inputs[k] = False
+        if isinstance(self.state, (Gameplay, LevelComplete)) and self.state.next_state == StateName.MAIN_MENU:
+            MainMenu.STARTING_MENU_PAGE = 0
+            MainMenu.STARTING_MENU_ITEM = 0
         self.state = self.states[self.state.next_state]()
 
     def fixed_update(self) -> None:

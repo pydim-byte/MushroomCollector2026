@@ -18,14 +18,18 @@ class Boss(DynamicObject):
 
         self.spore_to_spaw : int = 18
         self.boss_time : bool = 0.0
-        self.boss_phases : list[Dict[str, Union[str, float]]] = [{"name" : "move_to_center", "duration" : 2.0},
-                                                                 {"name" : "shoot_player", "duration" : 0.6},
-                                                                 {"name" : "shoot_player", "duration" : 0.6},
-                                                                {"name" : "spawn_super_mushroom", "duration" : 0.6},]
+        self.boss_phases : list[Dict[str, Union[str, float]]] = [{"name" : "wait", "duration" : 2.0},
+                                                                 {"name" : "chase", "duration" : 10.0},
+                                                                 {"name" : "move_to_center", "duration" : 2.0},
+                                                                 {"name" : "shoot_player", "duration" : 16.0},
+                                                                {"name" : "spawn_super_mushroom", "duration" : 2.0},]
         
         self.hp : int = 3
         self.current_phase_index : int = 0
         self.current_phase : Dict[str, Union[str, float]] = self.boss_phases[self.current_phase_index]
+
+        self.shoot_time : float = 0
+        self.shoot_cooldown : float = 0.8
 
     def set_direction(self, direction="to_player") -> pygame.Vector2:
         if self.current_phase["name"] in ["wait", "shoot_player", "spawn_super_mushroom"]:
@@ -78,10 +82,12 @@ class Boss(DynamicObject):
             self.current_phase_index += 1
             self.current_phase_index %= len(self.boss_phases)
             self.current_phase = self.boss_phases[self.current_phase_index]
-            if self.current_phase["name"] == "shoot_player": self.spawn_spores()
-            elif self.current_phase["name"] == "spawn_super_mushroom": self.spawn_super_mushroom()
+            if self.current_phase["name"] == "spawn_super_mushroom": self.spawn_super_mushroom()
         elif self.current_phase["name"] == "shoot_player":
-            pass
+            self.shoot_time += dt
+            if self.shoot_time >= self.shoot_cooldown:
+                self.spawn_spores()
+                self.shoot_time = 0
 
     def draw(self, surf : pygame.surface.Surface, alpha : float) -> None:
         alpha_pos = self.pos * alpha + self.prev_pos * (1 - alpha)

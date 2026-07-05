@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+from game_modules.globals import SkinsUnlocks
 from game_modules.namings import StateName
 from game_modules.states.state import State
 from game_modules.assets_loader import AssetsLoader
@@ -19,11 +20,16 @@ class SkinsMenu(State):
                                                              pygame.color.Color(80, 80, 80)] 
         self.menu_actions = [self.next_skin, self.choose_skin, self.quit_menu]
 
+        self.skins_list = [None] + [skin for skin in SkinsUnlocks.SKINS.items() if skin[1]["unlocked"]]
+        self.skins_amount = len(self.skins_list)
+        self.current_skin_index = self.skins_list.index(World.PLAYER_SKIN[0])+1 if World.PLAYER_SKIN else 0
+
     def next_skin(self) -> None:
-        pass
+        self.current_skin_index += 1
+        self.current_skin_index %= self.skins_amount
 
     def choose_skin(self) -> None:
-        pass
+        World.PLAYER_SKIN = self.skins_list[self.current_skin_index][0], self.skins_list[self.current_skin_index][1]["skin"], self.skins_list[self.current_skin_index][1]["offset"] 
 
     def quit_menu(self) -> None:
         self.quit = True
@@ -63,8 +69,23 @@ class SkinsMenu(State):
             item_rect.y = (320 + i*60) - i*item_rect.height
             screen.blit(item_surf, item_rect)
 
+    def draw_player_skin(self, screen : pygame.surface.Surface) -> None:
+        player_surf = self.assets["player.png"]
+        player_rect = player_surf.get_rect()
+        player_rect.centerx = pygame.display.get_window_size()[0]//2
+        player_rect.centery = 200
+        screen.blit(player_surf, player_rect)
+
+        if self.skins_list[self.current_skin_index] is not None:
+            skin_surf = self.assets[self.skins_list[self.current_skin_index][1]["skin"]]
+            skin_offset = self.skins_list[self.current_skin_index][1]["offset"]
+            skin_rect = player_rect
+            skin_rect.move_ip(skin_offset)
+            screen.blit(skin_surf, skin_rect)
+
     def draw(self, screen : pygame.surface.Surface, alpha : float) -> None:
         for sprite in self.world.all_sprites:
             sprite.draw(screen, alpha)
         self.draw_menu_pages(screen)
+        self.draw_player_skin(screen)
 

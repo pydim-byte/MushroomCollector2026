@@ -30,7 +30,6 @@ class World:
     GAMEPLAY_LEVEL : int = 1
     PLAYER_SKIN : str = None #SkinsUnlocks.SKINS[7]["skin"], SkinsUnlocks.SKINS[7]["offset"]
     TOTAL_MUSHROOMS_COLLECTED : int = 0
-    BOUGHT_FROM_SHOP : bool = False
     def __init__(self, state : StateName = StateName.MAIN_MENU):
         self.state = state
         self.assets_loader = AssetsLoader()
@@ -72,6 +71,8 @@ class World:
             image = self.assets["over_screen.png"]
         elif self.state == StateName.CUTSCENE:
             image = self.assets["gameplay_background.png"]
+        elif self.state == StateName.SHOP:
+            image = self.assets["complete_screen.png"]
 
         pos = pygame.Vector2(0, 0)  
         self.background = StaticImage(image, pos)
@@ -113,8 +114,8 @@ class World:
         image = self.assets["player.png"]
         super_image = self.assets["super_player.png"]
         if World.PLAYER_SKIN:
-            skin = self.assets[World.PLAYER_SKIN[0]]
-            skin_offset = World.PLAYER_SKIN[1]
+            skin = self.assets[World.PLAYER_SKIN[1]]
+            skin_offset = World.PLAYER_SKIN[2]
         else:
             skin = None
             skin_offset = None
@@ -335,15 +336,21 @@ class World:
             self.assets["hit.wav"].play()
             if obj_a.super:
                 obj_b.hp -= 1
-            else:
+                obj_a.super = False
+                obj_a.super_time = 0
+                obj_a.image = obj_a.normal_player
+                obj_a.invinsible = True
+            elif not obj_a.invinsible:
                 obj_a.hp -= 1
+                obj_a.invinsible = True
 
             if obj_b.current_phase["name"] == "chase":
                 obj_b.knockback_vel.xy = boss_knockback_vector.xy
         elif isinstance(obj_a, Player) and isinstance(obj_b, Spore):   
             obj_b.kill()
-            if not obj_a.super:
+            if not obj_a.super and not obj_a.invinsible:
                 obj_a.hp -= 1
+                obj_a.invinsible = True
                 self.assets["hit.wav"].play()
         elif isinstance(obj_a, Player) and isinstance(obj_b, SuperMushroom):
             obj_a.start_super_state()

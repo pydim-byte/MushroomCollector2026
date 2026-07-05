@@ -31,22 +31,22 @@ class Gameplay(State):
 
     def complete_level(self) -> None:
         self.quit = True
-        
+        World.TOTAL_MUSHROOMS_COLLECTED += 20
         if World.GAMEPLAY_LEVEL in SkinsUnlocks.LEVELS_WITH_SHOP:
-            if not World.BOUGHT_FROM_SHOP:
-                #self.next_state = SHOP
+            if World.TOTAL_MUSHROOMS_COLLECTED >= 120:
+                self.next_state = StateName.SHOP
                 return
             
         if World.GAMEPLAY_LEVEL in SkinsUnlocks.LEVELS_WITH_SKINS:
             if not SkinsUnlocks.SKINS[World.GAMEPLAY_LEVEL]["unlocked"]:
                 self.next_state = StateName.NEW_SKIN
                 return
-
-        World.GAMEPLAY_LEVEL += 1
-        if World.GAMEPLAY_LEVEL != 1:
+        print(World.GAMEPLAY_LEVEL)
+        if World.GAMEPLAY_LEVEL != 9:
+            World.GAMEPLAY_LEVEL += 1
             self.next_state = StateName.CUTSCENE
         else:
-            self.next_state = StateName.GAMEPLAY
+            self.next_state = StateName.LEVEL_COMPLETE
 
 
     def handle_inputs(self, inputs : dict[pygame.event.Event, bool]) -> None:
@@ -68,6 +68,11 @@ class Gameplay(State):
             self.game_over()
         if self.world.collected_mushrooms >= 20:
             self.complete_level()
+        if World.GAMEPLAY_LEVEL == 9:
+            if self.world.player.hp <= 0:
+                self.game_over()
+            elif self.world.boss.hp <= 0:
+                self.complete_level()
         for clock in self.world.object_clocks:
             clock.update(dt)
         self.world.all_sprites.update(dt)

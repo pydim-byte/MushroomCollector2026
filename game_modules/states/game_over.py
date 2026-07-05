@@ -10,7 +10,7 @@ import pygame
 class GameOver(State):
     def __init__(self):
         super().__init__()
-        self.world = World(state=StateName.LEVEL_COMPLETE)
+        self.world = World(state=StateName.GAME_OVER)
         self.assets_loader = AssetsLoader()
         self.assets = self.assets_loader.assets
         self.menu_items : list[str] = ["СПРОБУВАТИ ЗНОВУ", "НАЗАД В МЕНЮ"]
