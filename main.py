@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Dict
-import pygame, sys
-import multiprocessing
+import pygame, sys, ctypes
+import traceback
 from multiprocessing.connection import Connection
 from game_modules.globals import GameScreen, GameUpdate
 from game_modules.assets_loader import AssetsLoader
@@ -117,4 +117,9 @@ class Game:
             self.draw(alpha)
 
 game = Game()
-game.run()
+try:
+    game.run()
+except SystemExit:
+    pass
+except:
+    ctypes.windll.user32.MessageBoxW(None, traceback.format_exc(), "Error", 0)

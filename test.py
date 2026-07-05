@@ -1,4 +1,2 @@
-l = [1, (9, "ban"), (7, "test")]
-
-
-print(l.index((9,)))
+import ctypes
+ctypes.windll.user32.MessageBoxW(None, "NO", "Error", 0)
